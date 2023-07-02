@@ -132,6 +132,7 @@ function setTaskerEnv() {
     var obj = parse()
     var a = document.createElement('div');
     a.addEventListener('click', function handleClick(event) {
+        setWifi( false  )
         flash("successed")
         setLocal("hello", "world")
         setLocal("fileName", a.name)
