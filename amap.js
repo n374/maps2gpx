@@ -74,44 +74,52 @@ function toLocation(str) {
     return obj
 }
 
-separator = "__"
-queryString = decodeURI(document.URL).substring(document.URL.indexOf(separator) + separator.length)
-saddr = toLocation(getQueryVariable(queryString, "saddr"))
-daddr = toLocation(getQueryVariable(queryString, "daddr"))
+function parse() {
+    separator = "__"
+    queryString = decodeURI(document.URL).substring(document.URL.indexOf(separator) + separator.length)
+    saddr = toLocation(getQueryVariable(queryString, "saddr"))
+    daddr = toLocation(getQueryVariable(queryString, "daddr"))
 
 
-var jsonObj
-for (i in M.TS.d_ajax) {
-     if (M.TS.d_ajax[i].__ajaxName.includes("navigation")) {
-         jsonObj = JSON.parse(M.TS.d_ajax[i].response)
-     }
+    var jsonObj
+    for (i in M.TS.d_ajax) {
+        if (M.TS.d_ajax[i].__ajaxName.includes("navigation")) {
+            jsonObj = JSON.parse(M.TS.d_ajax[i].response)
+        }
+    }
+    var waypoints = []
+    jsonObj.pathlist.forEach(pathList => pathList.locations.forEach(location => {
+        location = gcj02towgs84(location[0], location[1])
+        waypoints.push({"longtitude":location[0], "latitude":location[1]})}
+    ))
+
+
+    gpxContent = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n'
+    gpxContent += '<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" creator="mapstogpx.com" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">\n'
+    //gpxContent += '<metadata>\n'
+    //gpxContent += `    <link href="${document.URL}">\n`
+    //gpxContent += `        <text>${window.title}</text>\n`
+    //gpxContent += `    </link>\n`
+    //gpxContent += '</metadata>\n'
+    gpxContent += '<trk>\n'
+    gpxContent += `<name>${daddr.name}_from_${saddr.name}</name>\n`
+    gpxContent += '<trkseg>\n'
+    waypoints.forEach(waypoint => gpxContent += `<trkpt lat="${waypoint.latitude}" lon="${waypoint.longtitude}"> </trkpt>\n`)
+    gpxContent +=   '</trkseg>\n'
+    gpxContent += '</trk>\n'
+    gpxContent += '</gpx>\n'
+
+    return {
+        "name": `${daddr.name}_from_${saddr.name}.gpx`
+        "gpxContent": gpxContent
+    }
 }
-var waypoints = []
-jsonObj.pathlist.forEach(pathList => pathList.locations.forEach(location => {
-    location = gcj02towgs84(location[0], location[1])
-    waypoints.push({"longtitude":location[0], "latitude":location[1]})}
-))
-
-
-gpxContent = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n'
-gpxContent += '<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" creator="mapstogpx.com" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">\n'
-//gpxContent += '<metadata>\n'
-//gpxContent += `    <link href="${document.URL}">\n`
-//gpxContent += `        <text>${window.title}</text>\n`
-//gpxContent += `    </link>\n`
-//gpxContent += '</metadata>\n'
-gpxContent += '<trk>\n'
-gpxContent += `<name>${daddr.name}_from_${saddr.name}</name>\n`
-gpxContent += '<trkseg>\n'
-waypoints.forEach(waypoint => gpxContent += `<trkpt lat="${waypoint.latitude}" lon="${waypoint.longtitude}"> </trkpt>\n`)
-gpxContent +=   '</trkseg>\n'
-gpxContent += '</trk>\n'
-gpxContent += '</gpx>\n'
 
 
 function download() {
-    content = gpxContent
-    filename = `${daddr.name}_from_${saddr.name}.gpx`
+    var obj = parse()
+    content = obj.gpxContent
+    filename = obj.name
     contentType = 'application/octet-stream';
     var a = document.createElement('a');
     var blob = new Blob([content], {'type':contentType});
@@ -121,10 +129,13 @@ function download() {
 }
 
 function setTaskerEnv() {
+    var obj = parse()
     var a = document.createElement('div');
     a.addEventListener('click', function handleClick(event) {
         flash("successed")
         setLocal("hello", "world")
+        setLocal("fileName", a.name)
+        setLocal("gpxContent", a.gpxContent)
     });
     a.click()
 }
