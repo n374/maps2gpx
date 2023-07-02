@@ -75,13 +75,17 @@ function toLocation(str) {
 }
 
 separator = "__"
-saddr = toLocation(getQueryVariable(document.URL.substring(document.URL.indexOf(separator) + separator.length), "saddr"))
-daddr = toLocation(getQueryVariable(document.URL.substring(document.URL.indexOf(separator) + separator.length), "daddr"))
+queryString = decodeURI(document.URL).substring(document.URL.indexOf(separator) + separator.length)
+saddr = toLocation(getQueryVariable(queryString, "saddr"))
+daddr = toLocation(getQueryVariable(queryString, "daddr"))
 
 
-
-
-jsonObj = JSON.parse(M.TS.d_ajax[0].response)
+var jsonObj
+for (i in M.TS.d_ajax) {
+     if (M.TS.d_ajax[i].__ajaxName.includes("navigation")) {
+         jsonObj = JSON.parse(M.TS.d_ajax[i].response)
+     }
+}
 var waypoints = []
 jsonObj.pathlist.forEach(pathList => pathList.locations.forEach(location => {
     location = gcj02towgs84(location[0], location[1])
