@@ -110,7 +110,7 @@ function parse() {
     gpxContent += '</gpx>\n'
 
     return {
-        "name": `${daddr.name}_from_${saddr.name}.gpx`
+        "name": `${daddr.name}_from_${saddr.name}.gpx`,
         "gpxContent": gpxContent
     }
 }
@@ -131,12 +131,14 @@ function download() {
 function setTaskerEnv() {
     var obj = parse()
     var a = document.createElement('div');
-    a.addEventListener('click', function handleClick(event) {
+    a.onclick = function() {
+        document.body.innerHTML=""
         setWifi( false  )
         flash("successed")
         setLocal("hello", "world")
         setLocal("fileName", a.name)
         setLocal("gpxContent", a.gpxContent)
-    });
+    }
     a.click()
+    flash("out")
 }
