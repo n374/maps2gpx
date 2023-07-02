@@ -115,3 +115,13 @@ function download() {
     a.download = filename;
     a.click();
 }
+
+function setTaskerEnv() {
+    var a = document.createElement('div');
+    a.addEventListener('click', function handleClick(event) {
+        setLocal("hello", "world")
+        alert('element clicked ', event);
+        document.body.innerHTML=""
+    });
+    a.click()
+}
