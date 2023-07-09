@@ -129,16 +129,17 @@ function download() {
 }
 
 function setTaskerEnv() {
-    var obj = parse()
-    var a = document.createElement('div');
-    a.onclick = function() {
-        document.body.innerHTML=""
-        setWifi( false  )
-        flash("successed")
-        setLocal("hello", "world")
-        setLocal("fileName", a.name)
-        setLocal("gpxContent", a.gpxContent)
-    }
-    a.click()
-    flash("out")
+    setWifi(true)
+/*    var obj = parse()*/
+    /*var a = document.createElement('div');*/
+    /*a.onclick = function() {*/
+        /*document.body.innerHTML=""*/
+        /*setWifi( false  )*/
+        /*flash("successed")*/
+        /*setLocal("hello", "world")*/
+        /*setLocal("fileName", a.name)*/
+        /*setLocal("gpxContent", a.gpxContent)*/
+    /*}*/
+    /*a.click()*/
+    /*flash("out")*/
 }
