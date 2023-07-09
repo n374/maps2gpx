@@ -130,6 +130,8 @@ function download() {
 
 function setTaskerEnv() {
     setWifi(true)
+    flash("in function")
+    setLocal("hello", "world")
     tk.flash("in function")
     tk.setLocal("hello", "world")
 /*    var obj = parse()*/
