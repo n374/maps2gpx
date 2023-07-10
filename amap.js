@@ -123,20 +123,13 @@ function download() {
     a.click();
 }
 
-function setTaskerEnv() {
-    tk.flash("in function");
-/*    var obj = parse()*/
-    /*var a = document.createElement('div');*/
-    /*a.onclick = function() {*/
-        /*document.body.innerHTML=""*/
-        /*setWifi( false  )*/
-        /*flash("successed")*/
-        /*setLocal("hello", "world")*/
-        /*setLocal("fileName", a.name)*/
-        /*setLocal("gpxContent", a.gpxContent)*/
-    /*}*/
-    /*a.click()*/
-    /*flash("out")*/
-}
+function tasker() {
+    var obj = parse();
+    var dir = "Download/Tasker/GPX/";
+    var gpxPath = dir +String(obj.name);
 
-setTaskerEnv();
+    tk.createDir(dir, true, false);
+    tk.writeFile(gpxPath, String(obj.gpxContent), false);
+    tk.setLocal("gpx_path",gpxPath);
+    tk.flash("save gpx to " + gpxPath);
+}
